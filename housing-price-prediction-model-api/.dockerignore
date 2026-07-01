@@ -1,0 +1,7 @@
+.venv/
+__pycache__/
+*.pyc
+.git/
+.gitignore
+catboost_info/
+data/prediction_result.csv

@@ -1,0 +1,35 @@
+{
+  "model_name": "CatBoostRegressor",
+  "params": {
+    "iterations": 500,
+    "depth": 6,
+    "learning_rate": 0.05,
+    "l2_leaf_reg": 3.0,
+    "random_seed": 39
+  },
+  "evaluation": {
+    "MAE": 5482.51,
+    "RMSE": 6458.5,
+    "R2": 0.9925
+  },
+  "feature_importance": {
+    "bedrooms": 18.4,
+    "size_category": 13.15,
+    "distance_to_city_center": 9.31,
+    "house_age": 8.89,
+    "year_built": 8.81,
+    "is_new_house": 7.67,
+    "school_rating": 5.75,
+    "bathrooms": 4.67,
+    "school_distance_interaction": 4.5,
+    "square_footage": 4.04,
+    "total_rooms": 4.02,
+    "lot_size": 3.04,
+    "lot_to_house_ratio": 2.44,
+    "bedroom_ratio": 2.42,
+    "sqft_per_bathroom": 1.5,
+    "sqft_per_bedroom": 1.39,
+    "age_category": 0.0,
+    "distance_category": 0.0
+  }
+}
