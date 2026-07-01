@@ -1,6 +1,6 @@
-# HSBC 房产解决方案项目集
+# HSBC Property Solutions
 
-[中文](#中文文档) | **English**
+**English** | [中文](#中文文档)
 
 ---
 
@@ -82,6 +82,8 @@ docker run -d --name housing-price-api -p 8000:8000 housing-price-api
 
 **2. Start the Java Market Analysis Backend**
 
+> **Prerequisites:** JDK 21+
+
 ```bash
 cd property-market-analysis-java-backend
 ./mvnw.cmd spring-boot:run
@@ -89,9 +91,17 @@ cd property-market-analysis-java-backend
 
 **3. Start the Python Value Estimator Backend**
 
+> **Prerequisites:** Python 3.13+
+
 ```bash
 cd property-value-estimator-python-backend
-python -m venv .venv && .venv\Scripts\activate
+
+# Create and activate virtual environment
+python -m venv .venv
+.venv\Scripts\activate        # Windows
+# source .venv/bin/activate   # Linux/Mac
+
+# Install dependencies and start the server on port 8002
 pip install -r requirements.txt
 python -m app.main
 ```
@@ -195,6 +205,8 @@ docker run -d --name housing-price-api -p 8000:8000 housing-price-api
 
 **2. 启动 Java 市场分析后端**
 
+> **前置条件：** JDK 21+
+
 ```bash
 cd property-market-analysis-java-backend
 ./mvnw.cmd spring-boot:run
@@ -202,9 +214,17 @@ cd property-market-analysis-java-backend
 
 **3. 启动 Python 估值后端**
 
+> **前置条件：** Python 3.13+
+
 ```bash
 cd property-value-estimator-python-backend
-python -m venv .venv && .venv\Scripts\activate
+
+# 创建并激活虚拟环境
+python -m venv .venv
+.venv\Scripts\activate        # Windows
+# source .venv/bin/activate   # Linux/Mac
+
+# 安装依赖并启动服务，端口 8002
 pip install -r requirements.txt
 python -m app.main
 ```
