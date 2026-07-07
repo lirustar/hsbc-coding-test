@@ -133,6 +133,17 @@ interface HistoryItem {
 const HISTORY_STORAGE_KEY = "property-value-estimator-history";
 const MAX_HISTORY_ITEMS = 10;
 
+// Dataset statistics derived from House Price Dataset.csv (50 records)
+const datasetStats: Record<keyof HouseInput, { min: number; max: number; avg: number }> = {
+  square_footage:           { min: 980,  max: 2400, avg: 1680 },
+  bedrooms:                 { min: 2,    max: 4,    avg: 2.96 },
+  bathrooms:                { min: 1,    max: 3,    avg: 1.95 },
+  year_built:               { min: 1978, max: 2012, avg: 1995.24 },
+  lot_size:                 { min: 4400, max: 10500, avg: 7229 },
+  distance_to_city_center:  { min: 1.0,  max: 10.0,  avg: 5.0 },
+  school_rating:            { min: 1.0,  max: 10.0,  avg: 5.0 },
+};
+
 export default function PropertyValueEstimator() {
   const [form, setForm] = useState<HouseInput>(initialForm);
   const [result, setResult] = useState<PredictionResult | null>(null);
@@ -169,22 +180,27 @@ export default function PropertyValueEstimator() {
     }
   };
 
-  // Normal distribution CDF for percentile calculation
-  // mean = midpoint of range, sigma = range/4 so ±3σ covers full range
-  const normalCDFPercent = (value: number, min: number, max: number, inverse = false): number => {
-    const mean = (min + max) / 2;
-    const sigma = (max - min) / 4;
-    const x = inverse ? mean - (value - mean) : value;
-    const z = (x - mean) / sigma;
-    // Approximation of standard normal CDF (Abramowitz & Stegun)
-    const a1 = 0.254829592, a2 = -0.284496736, a3 = 1.421413741;
-    const a4 = -1.453152027, a5 = 1.061405429, p = 0.3275911;
-    const sign = z < 0 ? -1 : 1;
-    const absZ = Math.abs(z) / Math.SQRT2;
-    const t = 1.0 / (1.0 + p * absZ);
-    const y = 1.0 - ((((a5 * t + a4) * t + a3) * t + a2) * t + a1) * t * Math.exp(-absZ * absZ);
-    const cdf = 0.5 * (1.0 + sign * y);
-    return Math.max(0, Math.min(100, cdf * 100));
+  // Normalize: CSV dataset min → 0, avg → 50 (center), max → 100
+  const normalizeValue = (value: number, key: keyof HouseInput): number => {
+    const stats = datasetStats[key];
+    if (!stats || stats.max === stats.min) return 50;
+    const { min, max, avg } = stats;
+
+    let score: number;
+    // min → 0; avg → 50; max → 100
+    if (value >= avg) {
+      score = 50 + ((value - avg) / (max - avg)) * 50;
+    } else {
+      score = 50 - ((avg - value) / (avg - min)) * 50;
+    }
+    return Math.max(0, Math.min(100, Math.round(score)));
+  };
+
+  // Get comparison level label based on dataset average
+  const getComparisonLabel = (value: number, key: keyof HouseInput): string => {
+    const stats = datasetStats[key];
+    if (!stats) return "";
+    return value >= stats.avg ? "Above avg" : "Below avg";
   };
 
   const validateField = (key: keyof HouseInput, value: number): string | null => {
@@ -308,34 +324,38 @@ export default function PropertyValueEstimator() {
       maximumFractionDigits: 0,
     }).format(price);
 
-  // Normalize values to 0-100 scale using normal distribution CDF
+  // Normalize values to 0-100 scale based on dataset min/max
   const getNormalizedData = () => {
     if (!result) return [];
     return fields.map((field) => {
       const value = result.input[field.key];
-      const inverse = field.key === "distance_to_city_center";
-      const score = normalCDFPercent(value, field.min, field.max, inverse);
+      const score = normalizeValue(value, field.key);
+      const stats = datasetStats[field.key];
       return {
         field: field.label,
-        value: Math.round(score),
+        value: score,
         rawValue: value,
+        avg: stats.avg,
         unit: field.unit,
+        comparison: getComparisonLabel(value, field.key),
       };
     });
   };
 
-  // Bar chart data (normal distribution percentile)
+  // Bar chart data (dataset-relative percentile)
   const getBarChartData = () => {
     if (!result) return [];
     return fields.map((field) => {
       const value = result.input[field.key];
-      const inverse = field.key === "distance_to_city_center";
-      const score = normalCDFPercent(value, field.min, field.max, inverse);
+      const score = normalizeValue(value, field.key);
+      const stats = datasetStats[field.key];
       return {
         name: field.label.length > 12 ? field.label.substring(0, 12) + "..." : field.label,
-        value: Math.round(score),
+        value: score,
         rawValue: value,
+        avg: stats.avg,
         unit: field.unit,
+        comparison: getComparisonLabel(value, field.key),
       };
     });
   };
@@ -557,7 +577,7 @@ export default function PropertyValueEstimator() {
                           {/* Bar Chart */}
                           <div>
                             <h3 className="text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-3">
-                              Value Distribution (% of range)
+                              Dataset Relative Score (0–100)
                             </h3>
                             <div className="h-48">
                               <ResponsiveContainer width="100%" height="100%">
@@ -583,7 +603,7 @@ export default function PropertyValueEstimator() {
                                       color: '#fff',
                                     }}
                                     formatter={(value, name, props) => [
-                                      `${props.payload.rawValue} ${props.payload.unit}`,
+                                      `${props.payload.rawValue} ${props.payload.unit} (avg: ${props.payload.avg})`,
                                       props.payload.name,
                                     ]}
                                   />
@@ -637,7 +657,7 @@ export default function PropertyValueEstimator() {
                                       color: '#fff',
                                     }}
                                     formatter={(value, name, props) => [
-                                      `${props.payload.rawValue} ${props.payload.unit}`,
+                                      `${props.payload.rawValue} ${props.payload.unit} (avg: ${props.payload.avg}) — ${props.payload.comparison}`,
                                       props.payload.field,
                                     ]}
                                   />

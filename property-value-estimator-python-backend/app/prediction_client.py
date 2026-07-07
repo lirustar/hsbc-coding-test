@@ -1,9 +1,10 @@
 import httpx
+import os
 from typing import Any, Dict, List
 
 from app.schemas import HouseInput, BatchInput, PredictionResult, BatchResult
 
-PREDICTION_API_BASE = "http://localhost:8000"
+PREDICTION_API_BASE = os.getenv("PREDICTION_API_BASE_URL", "http://localhost:8000")
 
 
 class PredictionClient:
