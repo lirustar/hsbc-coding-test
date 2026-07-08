@@ -65,7 +65,7 @@ uvicorn main:app --reload --host 127.0.0.1 --port 8000
 
 ```bash
 docker build -t housing-price-api .
-docker run -p 8000:8000 housing-price-api
+docker run -p 8000:8000 --name housing-price-api housing-price-api
 ```
 
 ### API Endpoints
