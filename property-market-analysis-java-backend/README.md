@@ -90,6 +90,24 @@ After starting the application, access the Swagger UI:
 GET /api/market/properties/table?bedrooms=3&minPrice=200000&sortBy=price&sortOrder=desc&page=0&size=5
 ```
 
+## Docker
+
+### Build Image
+
+```bash
+docker build -t property-market-analysis .
+```
+
+### Run Container
+
+```bash
+docker run -d -p 8001:8001 --name property-market-analysis property-market-analysis
+```
+
+The Docker image uses a multi-stage build:
+1. **Build stage** — `maven:3.9-eclipse-temurin-21` compiles the project
+2. **Runtime stage** — `eclipse-temurin:21-jre` runs the JAR as a non-root user (`appuser`)
+
 ## Caching
 
 The `/api/predict` endpoint uses Caffeine cache with a **10-minute TTL**. Identical requests within 10 minutes are served from cache without calling the downstream API.
@@ -221,6 +239,24 @@ src/main/java/com/hsbc/propertymarketanalysis/
 ```
 GET /api/market/properties/table?bedrooms=3&minPrice=200000&sortBy=price&sortOrder=desc&page=0&size=5
 ```
+
+## Docker
+
+### 构建镜像
+
+```bash
+docker build -t property-market-analysis .
+```
+
+### 运行容器
+
+```bash
+docker run -d -p 8001:8001 --name property-market-analysis property-market-analysis
+```
+
+Docker 镜像采用多阶段构建：
+1. **构建阶段** — 使用 `maven:3.9-eclipse-temurin-21` 编译项目
+2. **运行阶段** — 使用 `eclipse-temurin:21-jre`，以非 root 用户（`appuser`）运行 JAR
 
 ## 缓存机制
 

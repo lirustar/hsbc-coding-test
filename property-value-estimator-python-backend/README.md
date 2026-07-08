@@ -27,6 +27,7 @@ property-value-estimator-python-backend/
 │   ├── schemas.py             # Pydantic data models
 │   └── prediction_client.py   # Downstream prediction service client
 ├── requirements.txt
+├── Dockerfile
 └── README.md
 ```
 
@@ -65,6 +66,23 @@ python -m app.main
 ```
 
 The server will start on port **8002**. Access the Swagger UI at: `http://localhost:8002/docs`
+
+### Docker
+
+1. Build the Docker image:
+```bash
+docker build -t property-value-estimator .
+```
+
+2. Run the container:
+```bash
+docker run -p 8002:8002 --name property-value-estimator property-value-estimator
+```
+
+The container exposes port **8002**. By default, `PREDICTION_API_BASE_URL` is set to `http://host.docker.internal:8000` to reach the downstream prediction service on the host machine. You can override it if needed:
+```bash
+docker run -p 8002:8002 -e PREDICTION_API_BASE_URL=http://custom-host:8000 property-value-estimator-python-backend
+```
 
 ## API Endpoints
 
@@ -135,6 +153,7 @@ property-value-estimator-python-backend/
 │   ├── schemas.py             # Pydantic 数据模型
 │   └── prediction_client.py   # 下游预测服务客户端
 ├── requirements.txt
+├── Dockerfile
 └── README.md
 ```
 
@@ -173,6 +192,23 @@ python -m app.main
 ```
 
 服务将在 **8002** 端口启动。访问 Swagger 文档：`http://localhost:8002/docs`
+
+### Docker
+
+1. 构建 Docker 镜像：
+```bash
+docker build -t property-value-estimator .
+```
+
+2. 运行容器：
+```bash
+docker run -p 8002:8002 --name property-value-estimator property-value-estimator
+```
+
+容器暴露端口 **8002**。默认 `PREDICTION_API_BASE_URL` 设置为 `http://host.docker.internal:8000`，用于访问宿主机上的下游预测服务。如需自定义：
+```bash
+docker run -p 8002:8002 -e PREDICTION_API_BASE_URL=http://custom-host:8000 property-value-estimator-python-backend
+```
 
 ## API 接口
 

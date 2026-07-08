@@ -10,7 +10,7 @@ class HouseInput(BaseModel):
     bathrooms: float = Field(..., gt=0, le=20, description="Number of bathrooms", examples=[2.0])
     year_built: int = Field(..., gt=1800, le=datetime.now().year, description="Year built", examples=[1997])
     lot_size: float = Field(..., gt=0, le=1000000, description="Lot size in square feet", examples=[6800])
-    distance_to_city_center: float = Field(..., ge=0, le=10, description="Distance to city center (1-10)", examples=[4.1])
+    distance_to_city_center: float = Field(..., ge=1, le=10, description="Distance to city center (1-10)", examples=[4.1])
     school_rating: float = Field(..., ge=1, le=10, description="School rating (1-10)", examples=[7.6])
 
     @field_validator("square_footage")

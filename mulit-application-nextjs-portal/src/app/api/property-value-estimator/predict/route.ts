@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const BACKEND_URL = process.env.PROPERTY_VALUATION_API_URL || "http://127.0.0.2:8002";
+const BACKEND_URL = process.env.PROPERTY_VALUATION_API_URL || "http://127.0.0.1:8002";
 
 export async function POST(request: NextRequest) {
   try {
